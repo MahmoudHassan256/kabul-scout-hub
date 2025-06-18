@@ -1,8 +1,7 @@
-
 export interface Scout {
   id: number;
   name: string;
-  group: string;
+  pressence: Date[];
   age: number;
   joinDate: string;
   phone?: string;
@@ -34,5 +33,5 @@ export interface Event {
   date: string;
   description: string;
   location?: string;
-  type: 'meeting' | 'trip' | 'workshop' | 'competition' | 'other';
+  type: "meeting" | "trip" | "workshop" | "competition" | "other";
 }
