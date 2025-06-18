@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Calendar, Image, Video, News } from 'lucide-react';
+import { Calendar, Image, Video, Newspaper } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -50,7 +50,7 @@ const Index = () => {
             </Link>
             
             <Link to="/news" className="scout-card p-6 text-center hover:scale-105 transition-transform duration-300">
-              <News className="mx-auto mb-4 text-scout-green" size={48} />
+              <Newspaper className="mx-auto mb-4 text-scout-green" size={48} />
               <h3 className="text-xl font-semibold mb-2 text-scout-green">الأخبار</h3>
               <p className="text-gray-600">اطلع على آخر أخبار وفعاليات السرية</p>
             </Link>
