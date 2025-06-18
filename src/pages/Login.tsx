@@ -103,13 +103,7 @@ const Login = () => {
               </button>
             </form>
 
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600 text-center">
-                للتجربة: <br />
-                البريد الإلكتروني: admin@kabul-scouts.com <br />
-                كلمة المرور: admin123
-              </p>
-            </div>
+            
           </div>
         </div>
       </section>

@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -13,7 +12,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -47,14 +46,34 @@ const deleteCookie = (name: string) => {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<{ email: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const AdminEmail = import.meta.env.VITE_ADMIN_LOGIN;
   const AdminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
 
+  // Check for existing authentication on component mount
+  useEffect(() => {
+    const authToken = getCookie('authToken');
+    const userEmail = getCookie('userEmail');
+    
+    if (authToken === 'authenticated' && userEmail) {
+      setIsAuthenticated(true);
+      setUser({ email: userEmail });
+    }
+    
+    setIsLoading(false);
+  }, []);
+
   const login = async (email: string, password: string): Promise<boolean> => {
     // Simple authentication - in a real app, this would call an API
-    if (email === 'admin@kabul-scouts.com' && password === 'admin123') {
+    if (email === AdminEmail && password === AdminPassword) {
       setIsAuthenticated(true);
       setUser({ email });
+      
+      // Set cookies
+      setCookie('authToken', 'authenticated', 7); // Expires in 7 days
+      setCookie('userEmail', email, 7);
+      
       return true;
     }
     return false;
@@ -63,6 +82,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     setIsAuthenticated(false);
     setUser(null);
+    
+    // Delete cookies
+    deleteCookie('authToken');
+    deleteCookie('userEmail');
   };
 
   const value = {
@@ -72,7 +95,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
   };
 
-
+  // Don't render children until we've checked for existing auth
+  if (isLoading) {
+    return <div>Loading...</div>; // Or your loading component
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
