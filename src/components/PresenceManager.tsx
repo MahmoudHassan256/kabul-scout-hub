@@ -2,48 +2,42 @@
 import { useState } from 'react';
 import { Calendar, Users, Check, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-interface Scout {
-  id: number;
-  name: string;
-  group: string;
-}
-
-interface PresenceRecord {
-  scoutId: number;
-  date: string;
-  isPresent: boolean;
-}
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Scout, PresenceRecord } from '@/types';
+import { mockScouts } from '@/data/mockScouts';
 
 const PresenceManager = () => {
   const { toast } = useToast();
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   
-  // Sample scouts data
-  const [scouts] = useState<Scout[]>([
-    { id: 1, name: 'أحمد محمد', group: 'الأشبال' },
-    { id: 2, name: 'فاطمة علي', group: 'الزهرات' },
-    { id: 3, name: 'يوسف أحمد', group: 'الكشافة' },
-    { id: 4, name: 'زينب حسن', group: 'المرشدات' },
-    { id: 5, name: 'محمد عبدالله', group: 'الجوالة' },
-    { id: 6, name: 'سارة محمود', group: 'الدليلات' },
-    { id: 7, name: 'عمر خالد', group: 'الأشبال' },
-    { id: 8, name: 'نور الدين', group: 'الكشافة' },
-  ]);
+  const [scouts] = useState<Scout[]>(mockScouts);
 
-  // Sample presence records
-  const [presenceRecords, setPresenceRecords] = useState<PresenceRecord[]>([
-    { scoutId: 1, date: '2024-06-15', isPresent: true },
-    { scoutId: 2, date: '2024-06-15', isPresent: true },
-    { scoutId: 3, date: '2024-06-15', isPresent: false },
-    { scoutId: 4, date: '2024-06-15', isPresent: true },
-    { scoutId: 5, date: '2024-06-15', isPresent: true },
-    { scoutId: 6, date: '2024-06-15', isPresent: false },
-    { scoutId: 7, date: '2024-06-15', isPresent: true },
-    { scoutId: 8, date: '2024-06-15', isPresent: true },
-  ]);
+  // Generate mock presence records for the current month
+  const generateMockPresenceRecords = (): PresenceRecord[] => {
+    const records: PresenceRecord[] = [];
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const sessionsPerMonth = [5, 12, 19, 26]; // Weekly sessions on specific days
+    
+    sessionsPerMonth.forEach(day => {
+      if (day <= daysInMonth) {
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        scouts.forEach(scout => {
+          // Random attendance with 80% probability of being present
+          const isPresent = Math.random() > 0.2;
+          records.push({
+            scoutId: scout.id,
+            date: dateStr,
+            isPresent
+          });
+        });
+      }
+    });
+    
+    return records;
+  };
 
+  const [presenceRecords, setPresenceRecords] = useState<PresenceRecord[]>(generateMockPresenceRecords());
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
   const monthNames = [
@@ -93,7 +87,8 @@ const PresenceManager = () => {
       return recordDate >= monthStart && recordDate <= monthEnd;
     });
 
-    const totalSessions = new Set(monthRecords.map(r => r.date)).size;
+    const uniqueDates = new Set(monthRecords.map(r => r.date));
+    const totalSessions = uniqueDates.size;
     const presentCount = monthRecords.filter(r => r.isPresent).length;
     const totalPossibleAttendance = totalSessions * scouts.length;
     const attendanceRate = totalPossibleAttendance > 0 ? (presentCount / totalPossibleAttendance) * 100 : 0;
@@ -122,9 +117,29 @@ const PresenceManager = () => {
         setCurrentMonth(currentMonth + 1);
       }
     }
+    // Regenerate presence records for the new month
+    setPresenceRecords(generateMockPresenceRecords());
+  };
+
+  // Get all session dates for the current month
+  const getSessionDates = () => {
+    const monthStart = new Date(currentYear, currentMonth, 1);
+    const monthEnd = new Date(currentYear, currentMonth + 1, 0);
+    
+    const sessionDates = new Set(
+      presenceRecords
+        .filter(record => {
+          const recordDate = new Date(record.date);
+          return recordDate >= monthStart && recordDate <= monthEnd;
+        })
+        .map(r => r.date)
+    );
+    
+    return Array.from(sessionDates).sort();
   };
 
   const stats = getMonthlyStats();
+  const sessionDates = getSessionDates();
 
   return (
     <div className="space-y-8">
@@ -154,53 +169,71 @@ const PresenceManager = () => {
           </div>
         </div>
 
-        {/* Date Selector */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            اختر تاريخ الجلسة:
-          </label>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-scout-green"
-          />
-        </div>
-
-        {/* Scouts Presence List */}
-        <div className="space-y-3">
-          <h4 className="text-lg font-semibold text-gray-800 mb-4">
-            حضور الكشافة - {new Date(selectedDate).toLocaleDateString('ar-EG')}
-          </h4>
-          {scouts.map((scout) => {
-            const isPresent = getPresenceForDate(scout.id, selectedDate);
-            return (
-              <div
-                key={scout.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 space-x-reverse">
-                    <h5 className="font-medium text-gray-900">{scout.name}</h5>
-                    <span className="text-sm text-gray-500 bg-gray-200 px-2 py-1 rounded">
-                      {scout.group}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => togglePresence(scout.id)}
-                  className={`flex items-center space-x-2 space-x-reverse px-4 py-2 rounded-lg transition-colors ${
-                    isPresent
-                      ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                      : 'bg-red-100 text-red-700 hover:bg-red-200'
-                  }`}
-                >
-                  {isPresent ? <Check size={16} /> : <X size={16} />}
-                  <span>{isPresent ? 'حاضر' : 'غائب'}</span>
-                </button>
-              </div>
-            );
-          })}
+        {/* Excel-style Presence Table */}
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-right font-bold">الاسم</TableHead>
+                <TableHead className="text-right font-bold">المجموعة</TableHead>
+                <TableHead className="text-right font-bold">العمر</TableHead>
+                {sessionDates.map(date => (
+                  <TableHead key={date} className="text-center font-bold min-w-[100px]">
+                    {new Date(date).toLocaleDateString('ar-EG', { day: '2-digit', month: '2-digit' })}
+                  </TableHead>
+                ))}
+                <TableHead className="text-center font-bold">الإجمالي</TableHead>
+                <TableHead className="text-center font-bold">النسبة</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {scouts.map((scout) => {
+                const scoutPresence = sessionDates.map(date => getPresenceForDate(scout.id, date));
+                const totalPresent = scoutPresence.filter(Boolean).length;
+                const attendanceRate = sessionDates.length > 0 ? Math.round((totalPresent / sessionDates.length) * 100) : 0;
+                
+                return (
+                  <TableRow key={scout.id} className="hover:bg-gray-50">
+                    <TableCell className="font-medium">{scout.name}</TableCell>
+                    <TableCell>{scout.group}</TableCell>
+                    <TableCell>{scout.age}</TableCell>
+                    {sessionDates.map(date => {
+                      const isPresent = getPresenceForDate(scout.id, date);
+                      return (
+                        <TableCell key={date} className="text-center">
+                          <button
+                            onClick={() => {
+                              setSelectedDate(date);
+                              togglePresence(scout.id);
+                            }}
+                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                              isPresent
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                : 'bg-red-100 text-red-700 hover:bg-red-200'
+                            }`}
+                          >
+                            {isPresent ? <Check size={16} /> : <X size={16} />}
+                          </button>
+                        </TableCell>
+                      );
+                    })}
+                    <TableCell className="text-center font-semibold">
+                      {totalPresent}/{sessionDates.length}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className={`px-2 py-1 rounded text-sm font-medium ${
+                        attendanceRate >= 80 ? 'bg-green-100 text-green-800' :
+                        attendanceRate >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {attendanceRate}%
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </div>
       </div>
 
@@ -236,22 +269,25 @@ const PresenceManager = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from(new Set(scouts.map(s => s.group))).map((group) => {
             const groupScouts = scouts.filter(s => s.group === group);
-            const groupPresence = groupScouts.filter(scout => 
-              getPresenceForDate(scout.id, selectedDate)
-            ).length;
+            const groupAttendanceRate = sessionDates.length > 0 ? 
+              groupScouts.reduce((total, scout) => {
+                const scoutPresence = sessionDates.filter(date => getPresenceForDate(scout.id, date)).length;
+                return total + (scoutPresence / sessionDates.length) * 100;
+              }, 0) / groupScouts.length : 0;
             
             return (
               <div key={group} className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-gray-800 mb-2">{group}</h4>
-                <div className="text-sm text-gray-600">
-                  الحضور: {groupPresence} من {groupScouts.length}
+                <div className="text-sm text-gray-600 mb-2">
+                  عدد الأعضاء: {groupScouts.length}
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div className="text-sm text-gray-600 mb-2">
+                  معدل الحضور: {Math.round(groupAttendanceRate)}%
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-scout-green h-2 rounded-full transition-all duration-300"
-                    style={{
-                      width: `${groupScouts.length > 0 ? (groupPresence / groupScouts.length) * 100 : 0}%`
-                    }}
+                    style={{ width: `${groupAttendanceRate}%` }}
                   ></div>
                 </div>
               </div>
