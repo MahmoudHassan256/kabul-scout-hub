@@ -14,6 +14,13 @@ export interface PresenceRecord {
   date: string;
   isPresent: boolean;
   notes?: string;
+  customColumns?: { [key: string]: string | boolean | number };
+}
+
+export interface CustomColumn {
+  id: string;
+  name: string;
+  type: 'text' | 'number' | 'boolean' | 'date';
 }
 
 export interface NewsItem {

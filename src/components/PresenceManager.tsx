@@ -1,15 +1,16 @@
-
 import { useState } from 'react';
 import { Calendar, Users, Check, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Scout, PresenceRecord } from '@/types';
+import { Scout, PresenceRecord, CustomColumn } from '@/types';
 import { mockScouts } from '@/data/mockScouts';
+import CustomColumnManager from './CustomColumnManager';
 
 const PresenceManager = () => {
   const { toast } = useToast();
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [customColumns, setCustomColumns] = useState<CustomColumn[]>([]);
   
   const [scouts] = useState<Scout[]>(mockScouts);
 
@@ -28,7 +29,8 @@ const PresenceManager = () => {
           records.push({
             scoutId: scout.id,
             date: dateStr,
-            isPresent
+            isPresent,
+            customColumns: {}
           });
         });
       }
@@ -44,6 +46,90 @@ const PresenceManager = () => {
     'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
     'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
   ];
+
+  const handleAddCustomColumn = (column: CustomColumn) => {
+    setCustomColumns(prev => [...prev, column]);
+  };
+
+  const handleRemoveCustomColumn = (columnId: string) => {
+    setCustomColumns(prev => prev.filter(col => col.id !== columnId));
+    // Remove custom column data from all records
+    setPresenceRecords(prev => 
+      prev.map(record => ({
+        ...record,
+        customColumns: Object.fromEntries(
+          Object.entries(record.customColumns || {}).filter(([key]) => key !== columnId)
+        )
+      }))
+    );
+  };
+
+  const updateCustomColumnValue = (scoutId: number, date: string, columnId: string, value: any) => {
+    setPresenceRecords(prev =>
+      prev.map(record => {
+        if (record.scoutId === scoutId && record.date === date) {
+          return {
+            ...record,
+            customColumns: {
+              ...record.customColumns,
+              [columnId]: value
+            }
+          };
+        }
+        return record;
+      })
+    );
+  };
+
+  const getCustomColumnValue = (scoutId: number, date: string, columnId: string) => {
+    const record = presenceRecords.find(
+      r => r.scoutId === scoutId && r.date === date
+    );
+    return record?.customColumns?.[columnId] || '';
+  };
+
+  const renderCustomColumnInput = (column: CustomColumn, scoutId: number, date: string) => {
+    const currentValue = getCustomColumnValue(scoutId, date, column.id);
+    
+    switch (column.type) {
+      case 'boolean':
+        return (
+          <input
+            type="checkbox"
+            checked={Boolean(currentValue)}
+            onChange={(e) => updateCustomColumnValue(scoutId, date, column.id, e.target.checked)}
+            className="w-4 h-4"
+          />
+        );
+      case 'number':
+        return (
+          <input
+            type="number"
+            value={currentValue || ''}
+            onChange={(e) => updateCustomColumnValue(scoutId, date, column.id, Number(e.target.value))}
+            className="w-16 px-1 py-1 text-xs border rounded"
+          />
+        );
+      case 'date':
+        return (
+          <input
+            type="date"
+            value={currentValue || ''}
+            onChange={(e) => updateCustomColumnValue(scoutId, date, column.id, e.target.value)}
+            className="w-24 px-1 py-1 text-xs border rounded"
+          />
+        );
+      default:
+        return (
+          <input
+            type="text"
+            value={currentValue || ''}
+            onChange={(e) => updateCustomColumnValue(scoutId, date, column.id, e.target.value)}
+            className="w-20 px-1 py-1 text-xs border rounded"
+          />
+        );
+    }
+  };
 
   const togglePresence = (scoutId: number) => {
     const existingRecord = presenceRecords.find(
@@ -61,7 +147,7 @@ const PresenceManager = () => {
     } else {
       setPresenceRecords(prev => [
         ...prev,
-        { scoutId, date: selectedDate, isPresent: true }
+        { scoutId, date: selectedDate, isPresent: true, customColumns: {} }
       ]);
     }
 
@@ -143,6 +229,13 @@ const PresenceManager = () => {
 
   return (
     <div className="space-y-8">
+      {/* Custom Column Manager */}
+      <CustomColumnManager
+        customColumns={customColumns}
+        onAddColumn={handleAddCustomColumn}
+        onRemoveColumn={handleRemoveCustomColumn}
+      />
+
       {/* Month Navigation */}
       <div className="scout-card p-6">
         <div className="flex items-center justify-between mb-6">
@@ -179,7 +272,12 @@ const PresenceManager = () => {
                 <TableHead className="text-right font-bold">العمر</TableHead>
                 {sessionDates.map(date => (
                   <TableHead key={date} className="text-center font-bold min-w-[100px]">
-                    {new Date(date).toLocaleDateString('ar-EG', { day: '2-digit', month: '2-digit' })}
+                    <div>{new Date(date).toLocaleDateString('ar-EG', { day: '2-digit', month: '2-digit' })}</div>
+                    {customColumns.map(column => (
+                      <div key={column.id} className="text-xs text-gray-500 mt-1">
+                        {column.name}
+                      </div>
+                    ))}
                   </TableHead>
                 ))}
                 <TableHead className="text-center font-bold">الإجمالي</TableHead>
@@ -201,19 +299,26 @@ const PresenceManager = () => {
                       const isPresent = getPresenceForDate(scout.id, date);
                       return (
                         <TableCell key={date} className="text-center">
-                          <button
-                            onClick={() => {
-                              setSelectedDate(date);
-                              togglePresence(scout.id);
-                            }}
-                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                              isPresent
-                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                : 'bg-red-100 text-red-700 hover:bg-red-200'
-                            }`}
-                          >
-                            {isPresent ? <Check size={16} /> : <X size={16} />}
-                          </button>
+                          <div className="space-y-1">
+                            <button
+                              onClick={() => {
+                                setSelectedDate(date);
+                                togglePresence(scout.id);
+                              }}
+                              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                                isPresent
+                                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                  : 'bg-red-100 text-red-700 hover:bg-red-200'
+                              }`}
+                            >
+                              {isPresent ? <Check size={16} /> : <X size={16} />}
+                            </button>
+                            {customColumns.map(column => (
+                              <div key={column.id} className="mt-1">
+                                {renderCustomColumnInput(column, scout.id, date)}
+                              </div>
+                            ))}
+                          </div>
                         </TableCell>
                       );
                     })}
