@@ -1,12 +1,15 @@
-
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Calendar, Plus, Edit, Trash2 } from 'lucide-react';
+import { Calendar, Plus, Edit, Trash2, LogOut } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Admin = () => {
   const { toast } = useToast();
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('schedule');
   const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '' });
   const [newNews, setNewNews] = useState({ title: '', content: '', summary: '' });
@@ -16,6 +19,15 @@ const Admin = () => {
     { id: 2, title: 'رحلة استكشافية', date: '2024-06-25', description: 'رحلة لاستكشاف الطبيعة' },
     { id: 3, title: 'ورشة مهارات', date: '2024-06-30', description: 'ورشة تطوير المهارات الكشفية' }
   ]);
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "تم تسجيل الخروج",
+      description: "تم تسجيل خروجك بنجاح",
+    });
+    navigate('/');
+  };
 
   const handleAddEvent = () => {
     if (newEvent.title && newEvent.date && newEvent.description) {
@@ -64,9 +76,23 @@ const Admin = () => {
       
       {/* Header */}
       <section className="bg-scout-green text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">لوحة الإدارة</h1>
-          <p className="text-xl">إدارة الجدول والأخبار</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center">
+            <div className="text-center flex-1">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">لوحة الإدارة</h1>
+              <p className="text-xl">إدارة الجدول والأخبار</p>
+            </div>
+            <div className="flex items-center space-x-4 space-x-reverse">
+              <span className="text-sm">مرحباً، {user?.email}</span>
+              <button
+                onClick={handleLogout}
+                className="flex items-center space-x-2 space-x-reverse bg-white text-scout-green px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <LogOut size={20} />
+                <span>تسجيل الخروج</span>
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
