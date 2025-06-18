@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Calendar, Plus, Edit, Trash2, LogOut } from 'lucide-react';
+import { Calendar, Plus, Edit, Trash2, LogOut, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import PresenceManager from '@/components/PresenceManager';
 
 const Admin = () => {
   const { toast } = useToast();
@@ -80,7 +81,7 @@ const Admin = () => {
           <div className="flex justify-between items-center">
             <div className="text-center flex-1">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">لوحة الإدارة</h1>
-              <p className="text-xl">إدارة الجدول والأخبار</p>
+              <p className="text-xl">إدارة الجدول والأخبار والحضور</p>
             </div>
             <div className="flex items-center space-x-4 space-x-reverse">
               <span className="text-sm">مرحباً، {user?.email}</span>
@@ -120,6 +121,16 @@ const Admin = () => {
               }`}
             >
               إدارة الأخبار
+            </button>
+            <button
+              onClick={() => setActiveTab('presence')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'presence'
+                  ? 'bg-white text-scout-green shadow-sm'
+                  : 'text-gray-500 hover:text-scout-green'
+              }`}
+            >
+              كشف الحضور
             </button>
           </div>
 
@@ -254,6 +265,11 @@ const Admin = () => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Presence Management */}
+          {activeTab === 'presence' && (
+            <PresenceManager />
           )}
         </div>
       </section>
