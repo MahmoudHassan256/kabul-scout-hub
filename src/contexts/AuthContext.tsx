@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -13,7 +12,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -25,10 +24,12 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<{ email: string } | null>(null);
+  const AdminEmail = import.meta.env.VITE_ADMIN_LOGIN;
+  const AdminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
 
   const login = async (email: string, password: string): Promise<boolean> => {
     // Simple authentication - in a real app, this would call an API
-    if (email === 'admin@kabul-scouts.com' && password === 'admin123') {
+    if (email === AdminEmail && password === AdminPassword) {
       setIsAuthenticated(true);
       setUser({ email });
       return true;

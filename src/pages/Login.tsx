@@ -1,19 +1,19 @@
-
-import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { LogIn } from 'lucide-react';
+import { useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { LogIn } from "lucide-react";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
 
   // If already authenticated, redirect to admin
   if (isAuthenticated) {
@@ -31,7 +31,7 @@ const Login = () => {
           title: "تم تسجيل الدخول بنجاح",
           description: "مرحباً بك في لوحة الإدارة",
         });
-        navigate('/admin');
+        navigate("/admin");
       } else {
         toast({
           title: "خطأ في تسجيل الدخول",
@@ -53,19 +53,26 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <section className="py-16">
         <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           <div className="scout-card p-8">
             <div className="text-center mb-8">
               <LogIn className="mx-auto mb-4 text-scout-green" size={48} />
-              <h1 className="text-3xl font-bold text-scout-green mb-2">تسجيل الدخول</h1>
-              <p className="text-gray-600">دخول لوحة إدارة سرية كابول الكشفية</p>
+              <h1 className="text-3xl font-bold text-scout-green mb-2">
+                تسجيل الدخول
+              </h1>
+              <p className="text-gray-600">
+                دخول لوحة إدارة سرية كابول الكشفية
+              </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   البريد الإلكتروني
                 </label>
                 <input
@@ -80,7 +87,10 @@ const Login = () => {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   كلمة المرور
                 </label>
                 <input
@@ -99,17 +109,9 @@ const Login = () => {
                 disabled={isLoading}
                 className="w-full scout-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
+                {isLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
               </button>
             </form>
-
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600 text-center">
-                للتجربة: <br />
-                البريد الإلكتروني: admin@kabul-scouts.com <br />
-                كلمة المرور: admin123
-              </p>
-            </div>
           </div>
         </div>
       </section>
