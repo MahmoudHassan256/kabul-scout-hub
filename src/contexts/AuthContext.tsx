@@ -72,10 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
   };
 
-  // Don't render children until we've checked for existing auth
-  if (isLoading) {
-    return <div>Loading...</div>; // Or your loading component
-  }
+
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
