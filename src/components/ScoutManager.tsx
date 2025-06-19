@@ -453,7 +453,7 @@ const ScoutManager = () => {
                 <TableHead className="bg-scout-green text-center">
                   الصف
                 </TableHead>
-              
+
                 <TableHead className="bg-scout-green text-center">
                   الهاتف
                 </TableHead>
@@ -486,11 +486,16 @@ const ScoutManager = () => {
                     )}
                   </TableCell>
                   <TableCell className="text-center">
-                    <div className="flex items-center justify-center space-x-1 space-x-reverse">
-                      <Phone size={14} />
-                      <span>{scout.parentPhone}</span>
-                    </div>
+                    {scout.parentPhone ? (
+                      <div className="flex items-center justify-center space-x-1 space-x-reverse">
+                        <Phone size={14} />
+                        <span>{scout.parentPhone}</span>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">غير متوفر</span>
+                    )}
                   </TableCell>
+
                   <TableCell className="text-center">
                     {scout.hasHealthProblem ? (
                       <div className="flex items-center justify-center space-x-1 space-x-reverse">
