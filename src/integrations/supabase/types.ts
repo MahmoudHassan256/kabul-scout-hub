@@ -9,7 +9,146 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      news_items: {
+        Row: {
+          author: string | null
+          category: string | null
+          content: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          is_published: boolean
+          publish_date: string
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          publish_date?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          publish_date?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      presence_records: {
+        Row: {
+          created_at: string
+          custom_columns: Json | null
+          date: string
+          id: string
+          is_present: boolean
+          notes: string | null
+          scout_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          custom_columns?: Json | null
+          date: string
+          id?: string
+          is_present?: boolean
+          notes?: string | null
+          scout_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          custom_columns?: Json | null
+          date?: string
+          id?: string
+          is_present?: boolean
+          notes?: string | null
+          scout_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presence_records_scout_id_fkey"
+            columns: ["scout_id"]
+            isOneToOne: false
+            referencedRelation: "scouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      scouts: {
+        Row: {
+          age: number | null
+          created_at: string
+          id: string
+          join_date: string | null
+          name: string
+          parent_phone: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          age?: number | null
+          created_at?: string
+          id?: string
+          join_date?: string | null
+          name: string
+          parent_phone?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          age?: number | null
+          created_at?: string
+          id?: string
+          join_date?: string | null
+          name?: string
+          parent_phone?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

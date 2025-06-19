@@ -1,11 +1,15 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  user: { email: string } | null;
+  login: (email: string, password: string) => Promise<{ error: string | null }>;
+  signup: (email: string, password: string, fullName?: string) => Promise<{ error: string | null }>;
+  logout: () => Promise<void>;
+  user: User | null;
+  session: Session | null;
   isLoading: boolean;
 }
 
@@ -23,82 +27,92 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Cookie utility functions
-const setCookie = (name: string, value: string, days: number = 7) => {
-  const expires = new Date();
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
-};
-
-const getCookie = (name: string): string | null => {
-  const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-  }
-  return null;
-};
-
-const deleteCookie = (name: string) => {
-  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;SameSite=Strict`;
-};
-
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<{ email: string } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
-  const AdminEmail = import.meta.env.VITE_ADMIN_LOGIN;
-  const AdminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
 
-  // Check for existing authentication on component mount
   useEffect(() => {
-    const authToken = getCookie('authToken');
-    const userEmail = getCookie('userEmail');
-    
-    if (authToken === 'authenticated' && userEmail) {
-      setIsAuthenticated(true);
-      setUser({ email: userEmail });
-    }
-    
-    setIsLoading(false);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      }
+    );
+
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    // Simple authentication - in a real app, this would call an API
-    if (email === AdminEmail && password === AdminPassword) {
-      setIsAuthenticated(true);
-      setUser({ email });
+  const login = async (email: string, password: string): Promise<{ error: string | null }> => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       
-      // Set cookies
-      setCookie('authToken', 'authenticated', 7); // Expires in 7 days
-      setCookie('userEmail', email, 7);
+      if (error) {
+        return { error: error.message };
+      }
       
-      return true;
+      return { error: null };
+    } catch (error) {
+      return { error: 'حدث خطأ أثناء تسجيل الدخول' };
     }
-    return false;
   };
 
-  const logout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
-    
-    // Delete cookies
-    deleteCookie('authToken');
-    deleteCookie('userEmail');
+  const signup = async (email: string, password: string, fullName?: string): Promise<{ error: string | null }> => {
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            full_name: fullName || ''
+          }
+        }
+      });
+      
+      if (error) {
+        return { error: error.message };
+      }
+      
+      return { error: null };
+    } catch (error) {
+      return { error: 'حدث خطأ أثناء إنشاء الحساب' };
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const value = {
-    isAuthenticated,
+    isAuthenticated: !!session?.user,
     login,
+    signup,
     logout,
     user,
+    session,
     isLoading,
   };
 
-  // Don't render children until we've checked for existing auth
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
