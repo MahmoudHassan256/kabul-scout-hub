@@ -1,15 +1,10 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ error: string | null }>;
-  signup: (email: string, password: string, fullName?: string) => Promise<{ error: string | null }>;
-  logout: () => Promise<void>;
-  user: User | null;
-  session: Session | null;
+  logout: () => void;
   isLoading: boolean;
 }
 
@@ -28,88 +23,38 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
-        setSession(session);
-        setUser(session?.user ?? null);
-        setIsLoading(false);
-      }
-    );
-
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    // Check if user is already logged in
+    const isLoggedIn = localStorage.getItem('admin_logged_in') === 'true';
+    setIsAuthenticated(isLoggedIn);
+    setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<{ error: string | null }> => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) {
-        return { error: error.message };
-      }
-      
+    const adminEmail = import.meta.env.VITE_ADMIN_LOGIN;
+    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+
+    if (email === adminEmail && password === adminPassword) {
+      setIsAuthenticated(true);
+      localStorage.setItem('admin_logged_in', 'true');
       return { error: null };
-    } catch (error) {
-      return { error: 'حدث خطأ أثناء تسجيل الدخول' };
     }
+
+    return { error: 'بيانات الدخول غير صحيحة' };
   };
 
-  const signup = async (email: string, password: string, fullName?: string): Promise<{ error: string | null }> => {
-    try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            full_name: fullName || ''
-          }
-        }
-      });
-      
-      if (error) {
-        return { error: error.message };
-      }
-      
-      return { error: null };
-    } catch (error) {
-      return { error: 'حدث خطأ أثناء إنشاء الحساب' };
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
+  const logout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('admin_logged_in');
   };
 
   const value = {
-    isAuthenticated: !!session?.user,
+    isAuthenticated,
     login,
-    signup,
     logout,
-    user,
-    session,
     isLoading,
   };
 

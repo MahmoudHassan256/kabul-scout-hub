@@ -12,12 +12,12 @@ import PresenceManager from "@/components/PresenceManager";
 
 const Admin = () => {
   const { toast } = useToast();
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("news");
 
-  const handleLogout = async () => {
-    await logout();
+  const handleLogout = () => {
+    logout();
     toast({
       title: "تم تسجيل الخروج",
       description: "تم تسجيل خروجك بنجاح",
@@ -40,7 +40,7 @@ const Admin = () => {
               <p className="text-xl">إدارة الأخبار والكشافة والحضور</p>
             </div>
             <div className="flex items-center space-x-4 space-x-reverse">
-              <span className="text-sm">مرحباً، {user?.email}</span>
+              <span className="text-sm">مرحباً، المدير</span>
               <button
                 onClick={handleLogout}
                 className="flex items-center space-x-2 space-x-reverse bg-white text-scout-green px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
