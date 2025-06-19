@@ -39,7 +39,7 @@ const NewsManager = () => {
     if (error) {
       console.error("Error fetching news:", error);
     }
-    setNews(data.length > 0 ? data : []);
+    setNews(data);
   }
   const resetForm = () => {
     setNewNews({
@@ -85,8 +85,6 @@ const NewsManager = () => {
       });
       console.error("Supabase insert error:", error.message, error.details);
     } else {
-      console.log(newsItem);
-
       resetForm();
       toast({
         title: "تم إضافة الخبر",
@@ -188,7 +186,7 @@ const NewsManager = () => {
     });
   };
 
-  const startEdit = (newsItem) => {
+  const startEdit = (newsItem:TablesInsert<'news_items'>) => {
     setEditingNews(newsItem);
     setNewNews({
       title: newsItem.title,
