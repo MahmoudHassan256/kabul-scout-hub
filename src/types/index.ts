@@ -22,17 +22,7 @@ export interface CustomColumn {
   type: 'text' | 'number' | 'boolean' | 'date';
 }
 
-export interface NewsItem {
-  id: number;
-  title: string;
-  summary: string;
-  content: string;
-  author: string;
-  publishDate: string;
-  category: string;
-  imageUrl?: string;
-  isPublished: boolean;
-}
+
 
 export interface Event {
   id: number;

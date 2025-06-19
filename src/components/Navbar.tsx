@@ -1,20 +1,19 @@
-
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
-import logo from "../photo/logo.png";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
+import logo from "/logo.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
   const navItems = [
-    { name: 'الرئيسية', path: '/' },
-    { name: 'الصور', path: '/photos' },
-    { name: 'الفيديوهات', path: '/videos' },
-    { name: 'الأخبار', path: '/news' },
-    { name: 'عن السرية', path: '/about' },
-    { name: 'الإدارة', path: '/admin' },
+    { name: "الرئيسية", path: "/" },
+    { name: "الصور", path: "/photos" },
+    { name: "الفيديوهات", path: "/videos" },
+    { name: "الأخبار", path: "/news" },
+    { name: "عن السرية", path: "/about" },
+    { name: "الإدارة", path: "/admin" },
   ];
 
   return (
@@ -23,9 +22,9 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <img 
-              src={logo} 
-              alt="شعار سرية كابول الكشفية" 
+            <img
+              src={logo}
+              alt="شعار سرية كابول الكشفية"
               className="h-10 w-10 rounded-full ml-3"
             />
             <Link to="/" className="text-2xl font-bold text-scout-green">
@@ -42,8 +41,8 @@ const Navbar = () => {
                   to={item.path}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                     location.pathname === item.path
-                      ? 'bg-scout-green text-white'
-                      : 'text-scout-green hover:bg-scout-green hover:text-white'
+                      ? "bg-scout-green text-white"
+                      : "text-scout-green hover:bg-scout-green hover:text-white"
                   }`}
                 >
                   {item.name}
@@ -74,8 +73,8 @@ const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                   className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
                     location.pathname === item.path
-                      ? 'bg-scout-green text-white'
-                      : 'text-scout-green hover:bg-scout-green hover:text-white'
+                      ? "bg-scout-green text-white"
+                      : "text-scout-green hover:bg-scout-green hover:text-white"
                   }`}
                 >
                   {item.name}
