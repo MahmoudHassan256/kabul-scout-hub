@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useCallback } from 'react';
 import { Calendar, Users, Check, X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -21,8 +22,6 @@ interface MonthlyStats {
   presentCount: number;
   totalPossibleAttendance: number;
 }
-
-
 
 // Utility functions
 const generateSessionDates = (year: number, month: number): string[] => {
@@ -370,8 +369,6 @@ const usePresenceManager = (scouts: Scout[]) => {
     };
   }, [presenceRecords, sessionDates, scouts.length]);
 
-
-
   const exportToPDFHandler = useCallback(async () => {
     try {
       await exportToPDF(
@@ -382,6 +379,10 @@ const usePresenceManager = (scouts: Scout[]) => {
         currentMonth,
         currentYear
       );
+      toast({
+        title: "تم تصدير ملف PDF",
+        description: "تم إنشاء ملف PDF للطباعة بنجاح",
+      });
     } catch (error) {
       toast({
         title: "خطأ في التصدير",
@@ -468,95 +469,6 @@ const MonthNavigation: React.FC<{
   </div>
 );
 
-const PresenceTable: React.FC<{
-  scouts: Scout[];
-  sessionDates: string[];
-  getPresenceForDate: (scoutId: number, date: string) => boolean;
-  togglePresence: (scoutId: number, date: string) => void;
-}> = ({ scouts, sessionDates, getPresenceForDate, togglePresence }) => (
-  <div className="overflow-x-auto">
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="text-right font-bold bg-scout-green">الاسم</TableHead>
-          <TableHead className="text-right font-bold bg-scout-green">العمر</TableHead>
-          {sessionDates.map(date => (
-            <TableHead key={date} className="text-center font-bold min-w-[100px] bg-scout-green">
-              {formatDateForDisplay(date)}
-            </TableHead>
-          ))}
-          <TableHead className="text-center font-bold bg-scout-green">الإجمالي</TableHead>
-          <TableHead className="text-center font-bold bg-scout-green">النسبة</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {scouts.map((scout) => {
-          const scoutPresence = sessionDates.map(date => getPresenceForDate(scout.id, date));
-          const totalPresent = scoutPresence.filter(Boolean).length;
-          const attendanceRate = sessionDates.length > 0 
-            ? Math.round((totalPresent / sessionDates.length) * 100) 
-            : 0;
-          
-          return (
-            <TableRow key={scout.id} className="hover:bg-gray-50">
-              <TableCell className="font-medium">{scout.name}</TableCell>
-              <TableCell>{scout.age}</TableCell>
-              {sessionDates.map(date => (
-                <TableCell key={date} className="text-center">
-                  <AttendanceButton
-                    isPresent={getPresenceForDate(scout.id, date)}
-                    onClick={() => togglePresence(scout.id, date)}
-                  />
-                </TableCell>
-              ))}
-              <TableCell className="text-center font-semibold">
-                {totalPresent}/{sessionDates.length}
-              </TableCell>
-              <TableCell className="text-center">
-                <AttendanceRateBadge rate={attendanceRate} />
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
-  </div>
-);
-
-const MonthlyStatsSection: React.FC<{
-  stats: MonthlyStats;
-  scoutCount: number;
-  currentMonth: number;
-  currentYear: number;
-}> = ({ stats, scoutCount, currentMonth, currentYear }) => (
-  <div className="scout-card p-6">
-    <h3 className="text-xl font-bold text-scout-green mb-6 flex items-center">
-      <Calendar className="ml-2" size={20} />
-      إحصائيات الشهر - {MONTH_NAMES[currentMonth]} {currentYear}
-    </h3>
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <div className="text-center">
-        <div className="text-2xl font-bold text-scout-green mb-1">{stats.totalSessions}</div>
-        <div className="text-gray-600 text-sm">عدد الجلسات</div>
-      </div>
-      <div className="text-center">
-        <div className="text-2xl font-bold text-blue-600 mb-1">{stats.attendanceRate}%</div>
-        <div className="text-gray-600 text-sm">معدل الحضور</div>
-      </div>
-      <div className="text-center">
-        <div className="text-2xl font-bold text-green-600 mb-1">{stats.presentCount}</div>
-        <div className="text-gray-600 text-sm">إجمالي الحضور</div>
-      </div>
-      <div className="text-center">
-        <div className="text-2xl font-bold text-gray-600 mb-1">{scoutCount}</div>
-        <div className="text-gray-600 text-sm">عدد الكشافة</div>
-      </div>
-    </div>
-  </div>
-);
-
-
-
 // Main component
 const PresenceManager: React.FC = () => {
   const [scouts] = useState<Scout[]>(mockScouts);
@@ -580,20 +492,82 @@ const PresenceManager: React.FC = () => {
           onNavigate={navigateMonth}
           onExportPDF={exportToPDF}
         />
-        <PresenceTable
-          scouts={scouts}
-          sessionDates={sessionDates}
-          getPresenceForDate={getPresenceForDate}
-          togglePresence={togglePresence}
-        />
+        
+        {/* Excel-style Presence Table */}
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-right font-bold bg-scout-green text-white sticky left-0">الاسم</TableHead>
+                <TableHead className="text-center font-bold bg-scout-green text-white">العمر</TableHead>
+                {sessionDates.map(date => (
+                  <TableHead key={date} className="text-center font-bold min-w-[100px] bg-scout-green text-white">
+                    {formatDateForDisplay(date)}
+                  </TableHead>
+                ))}
+                <TableHead className="text-center font-bold bg-scout-green text-white">الإجمالي</TableHead>
+                <TableHead className="text-center font-bold bg-scout-green text-white">النسبة</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {scouts.map((scout) => {
+                const scoutPresence = sessionDates.map(date => getPresenceForDate(scout.id, date));
+                const totalPresent = scoutPresence.filter(Boolean).length;
+                const attendanceRate = sessionDates.length > 0 
+                  ? Math.round((totalPresent / sessionDates.length) * 100) 
+                  : 0;
+                
+                return (
+                  <TableRow key={scout.id} className="hover:bg-gray-50">
+                    <TableCell className="font-medium sticky left-0 bg-white">{scout.name}</TableCell>
+                    <TableCell className="text-center">{scout.age}</TableCell>
+                    {sessionDates.map(date => (
+                      <TableCell key={date} className="text-center">
+                        <AttendanceButton
+                          isPresent={getPresenceForDate(scout.id, date)}
+                          onClick={() => togglePresence(scout.id, date)}
+                        />
+                      </TableCell>
+                    ))}
+                    <TableCell className="text-center font-semibold">
+                      {totalPresent}/{sessionDates.length}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <AttendanceRateBadge rate={attendanceRate} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
-      <MonthlyStatsSection
-        stats={monthlyStats}
-        scoutCount={scouts.length}
-        currentMonth={currentMonth}
-        currentYear={currentYear}
-      />
+      {/* Monthly Statistics */}
+      <div className="scout-card p-6">
+        <h3 className="text-xl font-bold text-scout-green mb-6 flex items-center">
+          <Calendar className="ml-2" size={20} />
+          إحصائيات الشهر - {MONTH_NAMES[currentMonth]} {currentYear}
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-scout-green mb-1">{monthlyStats.totalSessions}</div>
+            <div className="text-gray-600 text-sm">عدد الجلسات</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600 mb-1">{monthlyStats.attendanceRate}%</div>
+            <div className="text-gray-600 text-sm">معدل الحضور</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600 mb-1">{monthlyStats.presentCount}</div>
+            <div className="text-gray-600 text-sm">إجمالي الحضور</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-gray-600 mb-1">{scouts.length}</div>
+            <div className="text-gray-600 text-sm">عدد الكشافة</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
