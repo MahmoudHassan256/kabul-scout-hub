@@ -75,39 +75,38 @@ export interface Database {
         };
         Relationships: [];
       };
-    };
-
-    presence_records: {
-      Row: {
-        id: string;
-        scoutId: string;
-        date: string;
-        isPresent: boolean;
-        note: string | null;
-        created_at: string;
+      presence_records: {
+        Row: {
+          id: string;
+          scoutId: string;
+          date: string;
+          isPresent: boolean;
+          note: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          scoutId: string;
+          date: string;
+          isPresent: boolean;
+          note?: string | null;
+        };
+        Update: {
+          id?: string;
+          scoutId?: string;
+          date?: string;
+          isPresent?: boolean;
+          note?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "presence_records_scoutId_fkey";
+            columns: ["scoutId"];
+            referencedRelation: "scouts";
+            referencedColumns: ["id"];
+          }
+        ];
       };
-      Insert: {
-        id?: string;
-        scoutId: string;
-        date: string;
-        isPresent: boolean;
-        note?: string | null;
-      };
-      Update: {
-        id?: string;
-        scoutId?: string;
-        date?: string;
-        isPresent?: boolean;
-        note?: string | null;
-      };
-      Relationships: [
-        {
-          foreignKeyName: "presence_records_scoutId_fkey";
-          columns: ["scoutId"];
-          referencedRelation: "scouts";
-          referencedColumns: ["id"];
-        }
-      ];
     };
     Views: {};
     Functions: {};

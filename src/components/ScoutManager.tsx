@@ -40,6 +40,21 @@ const ScoutManager = () => {
     joinDate: "",
   });
 
+  // Function to sort scouts by class order
+  const sortScoutsByClass = (scoutsArray) => {
+    return scoutsArray.sort((a, b) => {
+      const indexA = ages.indexOf(a.class);
+      const indexB = ages.indexOf(b.class);
+      
+      // If class is not found in ages array, put it at the end
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      
+      return indexA - indexB;
+    });
+  };
+
   useEffect(() => {
     fetchScouts();
   });
@@ -49,7 +64,8 @@ const ScoutManager = () => {
     if (error) {
       console.error("Error fetching scouts:", error);
     }
-    setScouts(data.length > 0 ? data : []);
+    const sortedData = data?.length > 0 ? sortScoutsByClass(data) : [];
+    setScouts(sortedData);
   }
 
   const resetForm = () => {
@@ -185,6 +201,9 @@ const ScoutManager = () => {
     }
 
     const currentDate = new Date().toLocaleDateString("ar-EG");
+    
+    // Sort scouts for PDF export as well
+    const sortedScoutsForPDF = sortScoutsByClass([...scouts]);
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -274,7 +293,6 @@ const ScoutManager = () => {
           <p>تاريخ التصدير: ${currentDate}</p>
         </div>
         
-        
 
         <table>
           <thead>
@@ -287,7 +305,7 @@ const ScoutManager = () => {
             </tr>
           </thead>
           <tbody>
-            ${scouts
+            ${sortedScoutsForPDF
               .map(
                 (scout) => `
               <tr>
@@ -432,7 +450,7 @@ const ScoutManager = () => {
       <div className="scout-card p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-scout-green mb-6">
-            قائمة الكشافة
+            قائمة الكشافة (مرتبة حسب الصف)
           </h3>
           <button
             onClick={exportToPDF}
