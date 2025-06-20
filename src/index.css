@@ -65,7 +65,7 @@
 
 @layer components {
   .scout-gradient {
-    background: linear-gradient(135deg, #2d5016 0%, #4a7c23 50%, #ffd700 100%);
+    background: linear-gradient(135deg, #2d5016 0%, #4a7c23 50%, #072500 100%);
   }
   
   .scout-card {

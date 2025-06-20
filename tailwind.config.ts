@@ -23,7 +23,7 @@ export default {
 				'cairo': ['Cairo', 'sans-serif'],
 			},
 			colors: {
-				border: 'hsl(var(--border))',
+				border: 'hsl(var(--green))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
@@ -72,8 +72,7 @@ export default {
 					'green-light': '#4a7c23',
 					brown: '#8b4513',
 					'brown-light': '#cd853f',
-					gold: '#ffd700',
-					'gold-light': '#ffed4e'
+
 				}
 			},
 			borderRadius: {
