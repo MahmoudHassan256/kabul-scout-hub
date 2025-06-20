@@ -17,7 +17,7 @@ const Footer = () => {
               <li>
                 <a
                   href="/about"
-                  className="hover:text-scout-gold transition-colors"
+                  className="hover:text-scout-brown transition-colors"
                 >
                   عن السرية
                 </a>
@@ -25,7 +25,7 @@ const Footer = () => {
               <li>
                 <a
                   href="/news"
-                  className="hover:text-scout-gold transition-colors"
+                  className="hover:text-scout-brown transition-colors"
                 >
                   الأخبار
                 </a>
@@ -33,7 +33,7 @@ const Footer = () => {
               <li>
                 <a
                   href="/photos"
-                  className="hover:text-scout-gold transition-colors"
+                  className="hover:text-scout-brown transition-colors"
                 >
                   الصور
                 </a>
@@ -41,7 +41,7 @@ const Footer = () => {
               <li>
                 <a
                   href="/videos"
-                  className="hover:text-scout-gold transition-colors"
+                  className="hover:text-scout-brown transition-colors"
                 >
                   الفيديوهات
                 </a>
