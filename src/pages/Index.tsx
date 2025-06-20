@@ -1,7 +1,15 @@
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Calendar, Image, Video, Newspaper } from "lucide-react";
+import { Image, Video, Newspaper } from "lucide-react";
+import {
+  images1,
+  images2,
+  images3,
+  images4,
+  images5,
+  images6,
+} from "../assist/photos/index";
 const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -40,7 +48,7 @@ const Index = () => {
             استكشف محتوانا
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Link
               to="/photos"
               className="scout-card p-6 text-center hover:scale-105 transition-transform duration-300"
@@ -77,19 +85,6 @@ const Index = () => {
                 اطلع على آخر أخبار وفعاليات السرية
               </p>
             </Link>
-
-            <Link
-              to="/admin"
-              className="scout-card p-6 text-center hover:scale-105 transition-transform duration-300"
-            >
-              <Calendar className="mx-auto mb-4 text-scout-brown" size={48} />
-              <h3 className="text-xl font-semibold mb-2 text-scout-brown">
-                الجدول
-              </h3>
-              <p className="text-gray-600">
-                تابع جدول الأنشطة والفعاليات القادمة
-              </p>
-            </Link>
           </div>
         </div>
       </section>
@@ -111,26 +106,36 @@ const Index = () => {
                 اقرأ المزيد
               </Link>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <img
-                src={`https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=300&h=200&fit=crop`}
+                src={images1}
                 alt="صورة كشفية"
-                className="rounded-lg shadow-lg"
+                className="rounded-lg shadow-lg w-[300px] h-[200px] object-cover"
               />
               <img
-                src={`https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=300&h=200&fit=crop`}
+                src={images2}
                 alt="صورة كشفية"
-                className="rounded-lg shadow-lg mt-8"
+                className="rounded-lg shadow-lg -mt-8 w-[300px] h-[200px] object-cover"
               />
               <img
-                src={`https://images.unsplash.com/photo-1472396961693-142e6e269027?w=300&h=200&fit=crop`}
+                src={images3}
                 alt="صورة كشفية"
-                className="rounded-lg shadow-lg -mt-8"
+                className="rounded-lg shadow-lg w-[300px] h-[200px] object-cover"
               />
               <img
-                src={`https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=300&h=200&fit=crop`}
+                src={images4}
                 alt="صورة كشفية"
-                className="rounded-lg shadow-lg"
+                className="rounded-lg shadow-lg w-[300px] h-[200px] object-cover"
+              />
+              <img
+                src={images5}
+                alt="صورة كشفية"
+                className="rounded-lg shadow-lg mt-8 w-[300px] h-[200px] object-cover"
+              />
+              <img
+                src={images6}
+                alt="صورة كشفية"
+                className="rounded-lg shadow-lg w-[300px] h-[200px] object-cover"
               />
             </div>
           </div>

@@ -6,7 +6,8 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-4">سرية كابول الكشفية</h3>
             <p className="text-gray-300">
-              نحن نعمل على بناء جيل واعٍ ومتميز من خلال الأنشطة الكشفية المتنوعة
+              نحن نعمل على بناء جيل واعٍ ومتميز وتهدف سريتنا لتنشأة جيل ملتزم
+              بقيمه الاسلامية
             </p>
           </div>
 
@@ -51,9 +52,9 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-4">تواصل معنا</h3>
             <div className="text-gray-300 space-y-2">
-              <p>كابول</p>
+              <p>كابول - مركز البسملة</p>
               <p>البريد الإلكتروني:</p>
-              <p>info@kabul-scouts.org</p>
+              <a href="mailto:Islamikashaf@gmail.com">Islamikashaf@gmail.com</a>
             </div>
           </div>
         </div>
