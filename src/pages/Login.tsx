@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { LogIn } from 'lucide-react';
 
 const Login = () => {
@@ -50,16 +52,18 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 safe-area-top safe-area-bottom">
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-md">
-          <div className="scout-card p-6 sm:p-8">
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      
+      <section className="py-16">
+        <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="scout-card p-8">
             <div className="text-center mb-8">
               <LogIn className="mx-auto mb-4 text-scout-green" size={48} />
-              <h1 className="text-2xl sm:text-3xl font-bold text-scout-green mb-2">
+              <h1 className="text-3xl font-bold text-scout-green mb-2">
                 تسجيل الدخول
               </h1>
-              <p className="text-gray-600 text-sm sm:text-base">
+              <p className="text-gray-600">
                 دخول لوحة إدارة سرية كابول الكشفية
               </p>
             </div>
@@ -75,7 +79,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-scout-green text-base"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-scout-green"
                   placeholder="admin@kabul-scouts.com"
                 />
               </div>
@@ -90,7 +94,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-scout-green text-base"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-scout-green"
                   placeholder="••••••••"
                 />
               </div>
@@ -98,14 +102,16 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full scout-btn-primary disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+                className="w-full scout-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
               </button>
             </form>
           </div>
         </div>
-      </div>
+      </section>
+
+      <Footer />
     </div>
   );
 };
