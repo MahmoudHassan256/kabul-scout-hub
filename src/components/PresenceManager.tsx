@@ -208,33 +208,38 @@ const PresenceManager = () => {
     const record = presenceRecords.find(
       (r) => r.scoutId === scoutId && r.date === date
     );
+
     if (record) {
+      // Presence exists → delete it (mark as absent)
       const { error } = await supabase
         .from("presence_records")
-        .update({ isPresent: !record.isPresent })
+        .delete()
         .eq("id", record.id);
+
       if (!error) {
-        setPresenceRecords((prev) =>
-          prev.map((r) =>
-            r.id === record.id ? { ...r, isPresent: !r.isPresent } : r
-          )
-        );
+        setPresenceRecords((prev) => prev.filter((r) => r.id !== record.id));
+        const scout = scouts.find((s) => s.id === scoutId);
+        toast({
+          title: "تم حذف الحضور",
+          description: `تم حذف حضور ${scout?.fullName} في ${date}`,
+        });
       }
     } else {
+      // Presence doesn't exist → insert it (mark as present)
       const { data, error } = await supabase
         .from("presence_records")
         .insert({ scoutId, date, isPresent: true })
         .select();
+
       if (!error && data) {
         setPresenceRecords((prev) => [...prev, data[0]]);
+        const scout = scouts.find((s) => s.id === scoutId);
+        toast({
+          title: "تم تسجيل الحضور",
+          description: `تم تسجيل حضور ${scout?.fullName} في ${date}`,
+        });
       }
     }
-
-    const scout = scouts.find((s) => s.id === scoutId);
-    toast({
-      title: "تم تحديث الحضور",
-      description: `تم تحديث حضور ${scout?.fullName}`,
-    });
   };
 
   const totalSessions = sessionDates.length;
