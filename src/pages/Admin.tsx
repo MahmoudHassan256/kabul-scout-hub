@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { LogOut, Users, FileText, Calendar } from "lucide-react";
@@ -14,7 +13,14 @@ const Admin = () => {
   const { toast } = useToast();
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("news");
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem("activeTab") || "news";
+  });
+
+  useEffect(() => {
+    // Update localStorage whenever activeTab changes
+    localStorage.setItem("activeTab", activeTab);
+  }, [activeTab]);
 
   const handleLogout = () => {
     logout();

@@ -267,7 +267,17 @@ const PresenceManager = () => {
   const handleSort = () => {
     setScouts(sortScoutsByClass([...scouts]));
   };
+  useEffect(() => {
+    loadScouts();
+    const interval = setInterval(loadScouts, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval);
+  }, []);
 
+  useEffect(() => {
+    loadPresence();
+    const interval = setInterval(loadPresence, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval);
+  }, [selectedMonth, selectedYear]);
   return (
     <div className="space-y-8">
       <div className="scout-card p-6">

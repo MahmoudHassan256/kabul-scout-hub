@@ -31,6 +31,8 @@ const NewsManager = () => {
 
   useEffect(() => {
     fetchNews();
+    const interval = setInterval(fetchNews, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval);
   });
 
   async function fetchNews() {
@@ -186,7 +188,7 @@ const NewsManager = () => {
     });
   };
 
-  const startEdit = (newsItem:TablesInsert<'news_items'>) => {
+  const startEdit = (newsItem: TablesInsert<"news_items">) => {
     setEditingNews(newsItem);
     setNewNews({
       title: newsItem.title,

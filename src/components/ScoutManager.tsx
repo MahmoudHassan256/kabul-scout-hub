@@ -45,19 +45,21 @@ const ScoutManager = () => {
     return scoutsArray.sort((a, b) => {
       const indexA = ages.indexOf(a.class);
       const indexB = ages.indexOf(b.class);
-      
+
       // If class is not found in ages array, put it at the end
       if (indexA === -1 && indexB === -1) return 0;
       if (indexA === -1) return 1;
       if (indexB === -1) return -1;
-      
+
       return indexA - indexB;
     });
   };
 
   useEffect(() => {
     fetchScouts();
-  });
+    const interval = setInterval(fetchScouts, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   async function fetchScouts() {
     const { data, error } = await supabase.from("scouts").select("*");
@@ -201,7 +203,7 @@ const ScoutManager = () => {
     }
 
     const currentDate = new Date().toLocaleDateString("ar-EG");
-    
+
     // Sort scouts for PDF export as well
     const sortedScoutsForPDF = sortScoutsByClass([...scouts]);
 
